@@ -105,9 +105,16 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
+
 .actions-section {
+ align-self: start;
+}
+
+.button-group {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+  gap: 10px;
+}
+
+.edit-icon {
+  color: #13c2c2;
 }

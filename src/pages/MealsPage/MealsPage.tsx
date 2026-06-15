@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { Button, Card, message } from 'antd';
+import { App, Button, Card, Popconfirm } from 'antd';
 import { mealsApi } from "../../api/mealsApi.ts";
 import type { MealItem } from "../../types/meal.ts";
-import { FireOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  FireOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import Loader from "../../shared/Loader/Loader.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -12,10 +17,13 @@ import "./MealsPage.css";
 import { AppRoutes } from "../../routing/routes.ts";
 
 const MealsPage = () => {
-
+  const {message} = App.useApp();
   const navigate = useNavigate();
+
   const [meals, setMeals] = useState<MealItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchMeals = async () => {
     try {
@@ -26,6 +34,19 @@ const MealsPage = () => {
       message.error('Error connecting to database' + error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await mealsApi.deleteMeal(id);
+      setMeals((prev) => prev.filter((meal) => meal.id !== id));
+      message.success('Meal deleted from server');
+    } catch (error) {
+      message.error('Could not complete deletion' + error);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -72,7 +93,6 @@ const MealsPage = () => {
               <motion.div
                 initial={{opacity: 0}}
                 animate={{opacity: 1}}
-                className="empty-state"
               >
                 No nutrition data available. Add a meal to get started.
               </motion.div>
@@ -91,15 +111,39 @@ const MealsPage = () => {
                         <span className="category-tag">{meal.type}</span>
                         <h3 className="description-text">{meal.description}</h3>
                         <span>{meal.calories} kcal</span>
+
                       </div>
-                    </div>
+                        <div className="actions-section">
+                          <div className="button-group">
+                            <Button
+                              icon={<EditOutlined className="edit-icon" />}
+                              onClick={() => navigate(`/meals/${meal.id}/edit`)}
+                              disabled={deletingId !== null}
+                            />
+                            <Popconfirm
+                              title="Delete this item?"
+                              onConfirm={() => handleDelete(meal.id)}
+                              okText="Yes"
+                              cancelText="No"
+                              placement="topRight"
+                            >
+                              <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                loading={deletingId === meal.id}
+                                disabled={deletingId !== null && deletingId !== meal.id}
+                              />
+                            </Popconfirm>
+                          </div>
+                          </div>
+                        </div>
                   </Card>
                 </motion.div>
               ))
-            )}
+              )}
           </AnimatePresence>
         </div>
-      )}
+        )}
     </div>
   );
 };
