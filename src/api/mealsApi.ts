@@ -17,5 +17,25 @@ export const mealsApi = {
       id,
       ...meal,
     }));
-  }
+  },
+
+  async getMealById(id: string): Promise<MealData | null> {
+    const response = await mealEndpoint.get<MealData | null>(
+      `/meals/${id}.json`
+    );
+
+    return response.data;
+  },
+
+  async createMeal(meal: MealData): Promise<void> {
+    await mealEndpoint.post('/meals.json', meal);
+  },
+
+  async updateMeal(id: string, meal: MealData): Promise<void> {
+    await mealEndpoint.put(`/meals/${id}.json`, meal);
+  },
+
+  async deleteMeal(id: string): Promise<void> {
+    await mealEndpoint.delete(`/meals/${id}.json`);
+  },
 };
