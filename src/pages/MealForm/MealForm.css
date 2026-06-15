@@ -1,0 +1,22 @@
+.form-container {
+  margin: 0 auto;
+  max-width: 900px;
+  padding: 40px 20px;
+}
+
+.back-btn {
+  color: rgba(255, 255, 255, 0.45);
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+.submit-btn {
+  background: #13c2c2 !important;
+  border-color: #13c2c2 !important;
+  height: 40px;
+  font-weight: 500;
+}
+.for-bottom{
+  margin-top: 20px;
+  margin-bottom: 0;
+}

@@ -1,0 +1,7 @@
+.App-wrapper {
+  width: 100%;
+}
+
+.layout-content {
+  min-height: calc(100vh - 115px);
+}

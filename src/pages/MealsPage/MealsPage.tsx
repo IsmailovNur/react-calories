@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { App, Button, Card, Popconfirm } from 'antd';
 import { mealsApi } from "../../api/mealsApi.ts";
 import type { MealItem } from "../../types/meal.ts";
@@ -12,9 +11,9 @@ import {
 import Loader from "../../shared/Loader/Loader.tsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { AppRoutes } from "../../routing/routes.ts";
 
 import "./MealsPage.css";
-import { AppRoutes } from "../../routing/routes.ts";
 
 const MealsPage = () => {
   const {message} = App.useApp();
@@ -31,7 +30,7 @@ const MealsPage = () => {
       const data = await mealsApi.getMeals();
       setMeals(data);
     } catch (error) {
-      message.error('Error connecting to database' + error);
+      message.error(`Error connecting to database ${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +43,7 @@ const MealsPage = () => {
       setMeals((prev) => prev.filter((meal) => meal.id !== id));
       message.success('Meal deleted from server');
     } catch (error) {
-      message.error('Could not complete deletion' + error);
+      message.error(`Could not complete deletion ${error}`);
     } finally {
       setDeletingId(null);
     }
@@ -105,7 +104,7 @@ const MealsPage = () => {
                   exit={{opacity: 0, x: -20, scale: 0.98}}
                   transition={{duration: 0.2}}
                 >
-                  <Card className="meal-card" hoverable>
+                  <Card className="meal-card">
                     <div className="meal-card-body">
                       <div className="meal-details">
                         <span className="category-tag">{meal.type}</span>
@@ -113,37 +112,37 @@ const MealsPage = () => {
                         <span>{meal.calories} kcal</span>
 
                       </div>
-                        <div className="actions-section">
-                          <div className="button-group">
+                      <div className="actions-section">
+                        <div className="button-group">
+                          <Button
+                            icon={<EditOutlined className="edit-icon" />}
+                            onClick={() => navigate(`/meals/${meal.id}/edit`)}
+                            disabled={deletingId !== null}
+                          />
+                          <Popconfirm
+                            title="Delete this item?"
+                            onConfirm={() => handleDelete(meal.id)}
+                            okText="Yes"
+                            cancelText="No"
+                            placement="topRight"
+                          >
                             <Button
-                              icon={<EditOutlined className="edit-icon" />}
-                              onClick={() => navigate(`/meals/${meal.id}/edit`)}
-                              disabled={deletingId !== null}
+                              danger
+                              icon={<DeleteOutlined />}
+                              loading={deletingId === meal.id}
+                              disabled={deletingId !== null && deletingId !== meal.id}
                             />
-                            <Popconfirm
-                              title="Delete this item?"
-                              onConfirm={() => handleDelete(meal.id)}
-                              okText="Yes"
-                              cancelText="No"
-                              placement="topRight"
-                            >
-                              <Button
-                                danger
-                                icon={<DeleteOutlined />}
-                                loading={deletingId === meal.id}
-                                disabled={deletingId !== null && deletingId !== meal.id}
-                              />
-                            </Popconfirm>
-                          </div>
-                          </div>
+                          </Popconfirm>
                         </div>
+                      </div>
+                    </div>
                   </Card>
                 </motion.div>
               ))
-              )}
+            )}
           </AnimatePresence>
         </div>
-        )}
+      )}
     </div>
   );
 };
